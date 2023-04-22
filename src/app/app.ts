@@ -16,7 +16,7 @@ export const initialize = async () => {
 
     Winston.configure(appConfig.appName, appConfig.logLevel);
 
-    Server.configure();
+    Server.configure(Config.getBooleanDevelopmentMode());
     await Server.start(Config.getServerConfig().serverPort);
 
   } catch (error: any) {
