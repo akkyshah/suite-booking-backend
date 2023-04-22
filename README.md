@@ -1,7 +1,5 @@
 # suite-booking-backend
 
----
-
 ### One-time configuration
 
 Install `node_modules` using command: `npm install`
@@ -25,8 +23,6 @@ Open project in WebStorm > Add/Edit Configuration > click (+) button > select `N
 > * Add new before-launch command > Compile Typescript > Select `tsconfig.json` file
 
 </details>
-
-<hr/>
 
 ### Run the app:
 
@@ -65,12 +61,10 @@ Open project in WebStorm > Add/Edit Configuration > click (+) button > select `M
 
 </details>
 
----
-
 ## Endpoints
 
 <details>
-<summary><b><i>GET /api/heath</i></b></summary>
+<summary><b><i>GET /api/heath/check</i></b></summary>
 
 Used to check if server is running and healthy. It will respond `200 OK` if it is running.
 </details>
