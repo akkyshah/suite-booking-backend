@@ -1,5 +1,6 @@
 import express from "express";
 import http from "http";
+import Cors from "@/core/http/express-middlewares/cors";
 import * as Winston from "../winston";
 
 const logger = Winston.getLogger(module.filename);
@@ -7,7 +8,8 @@ const logger = Winston.getLogger(module.filename);
 export const app = express();
 const server = http.createServer(app);
 
-export const configure = () => {
+export const configure = (enableDevMode: boolean) => {
+  app.use(Cors(enableDevMode));
   app.set("trust proxy", 1);
 };
 
