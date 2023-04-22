@@ -10,7 +10,7 @@ const CONFIGURATION: any = {
   logLevel: {env: "LOG_LEVEL"}
 };
 
-export const initialize = async () => {
+export const initialize = () => {
   if (!logger) logger = Winston.getLogger(module.filename);
 
   logger.info("reading configuration from environment variables");
@@ -55,4 +55,15 @@ function integerConverter(value: string) {
 
 function booleanConverter(value: string) {
   return value === "true";
+}
+
+/**
+ * NOTE: used only by tests
+ * */
+export const __setTestConfig = (configurations: any) => {
+  Object.keys(CONFIGURATION).map(key => {
+    if (configurations[key] !== undefined) {
+      CONFIGURATION[key].value = configurations[key]
+    }
+  })
 }
