@@ -1,6 +1,8 @@
 import bodyParser from "body-parser";
-import Cors from "@/core/http/express-middlewares/cors";
 import express, {Router} from "express";
+import Cors from "./express-middlewares/cors";
+import handle404 from "./express-middlewares/handle404";
+import ErrorHandler from "./express-middlewares/errorHandler";
 import http from "http";
 import * as Winston from "../winston";
 
@@ -21,6 +23,8 @@ export const configure = (enableDevMode: boolean) => {
 };
 
 export const start = async (serverPort?: number) => {
+  app.use(handle404);
+  app.use(ErrorHandler);
   const port = !serverPort ? 0 : serverPort;  // 0 will start server at random port
   await startHttp(port);
 };
