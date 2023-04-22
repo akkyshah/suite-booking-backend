@@ -3,6 +3,7 @@ import * as Winston from "../core/winston"
 import {Config} from "@/shared";
 import {LocalEnvironment} from "@/core";
 import {Server} from "@/core/http";
+import * as Health from "./health/api";
 
 const logger = Winston.getLogger(module.filename);
 
@@ -17,6 +18,9 @@ export const initialize = async () => {
     Winston.configure(appConfig.appName, appConfig.logLevel);
 
     Server.configure(Config.getBooleanDevelopmentMode());
+
+    Health.addHttpEndPoints();
+
     await Server.start(Config.getServerConfig().serverPort);
 
   } catch (error: any) {

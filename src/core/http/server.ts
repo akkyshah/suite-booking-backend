@@ -1,6 +1,6 @@
 import bodyParser from "body-parser";
 import Cors from "@/core/http/express-middlewares/cors";
-import express from "express";
+import express, {Router} from "express";
 import http from "http";
 import * as Winston from "../winston";
 
@@ -45,4 +45,8 @@ export const stop = async () => {
     logger.warn(`Could not stop HTTP server, error: ${error}`);
     throw error;
   }
+};
+
+export const bindApi = (url: string, router: Router) => {
+  app.use(`/api${url}`, router);
 };
