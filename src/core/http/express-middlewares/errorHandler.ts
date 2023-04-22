@@ -1,22 +1,24 @@
 import {NextFunction, Request, Response} from "express";
 import * as Winston from "../../winston"
+import {HttpError} from "@/core/http";
 import {StatusCode} from "@custom-types/core";
 import NestedError from "nested-error-stacks";
 
 const logger = Winston.getLogger(module.filename);
 
-/**
- * If nodejs crashes and response is not sent due to some internal error;
- * then this middleware will be called to return 500 internal error with an appropriate message.
- *
- * If error is instance of NestedError, we will recursively loop into the nested stack to respond with internal cause.
- * */
 const getHttpError = (err: any, depth: number = 0): { statusCode: number, errCode: string | undefined, message: string } => {
   if (typeof err === "string") {
     return {
       statusCode: StatusCode.INTERNAL_SERVER_ERROR,
       errCode: undefined,
       message: err
+    }
+  }
+  if (HttpError.isHttpError(err)) {
+    return {
+      statusCode: err.status,
+      errCode: err.errCode,
+      message: err.message
     }
   } else if (err instanceof NestedError) {
     // @ts-ignore
@@ -45,6 +47,12 @@ const getHttpError = (err: any, depth: number = 0): { statusCode: number, errCod
   }
 }
 
+/**
+ * If any API throws error, they must call next(...) function passing error param;
+ * this middleware will handle all the errors and sends response with appropriate response-codes based on instance of error.
+ * For internal crash/errors, it will respond with 500 status code.
+ * For error which are instance of HttpError - it will respond with specified error code and messages.
+ * */
 const errorHandler = (error: any, _: Request, response: Response, next: NextFunction) => {
   if (!error) {
     return next();
