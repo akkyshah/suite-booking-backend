@@ -39,3 +39,11 @@ Simply run the command: `npm run start`
 * **Clean**: `npm run clean` - deletes `./dist` directory.
 
 </details>
+
+## Endpoints
+
+<details>
+<summary><b><i>GET /api/heath</i></b></summary>
+
+Used to check if server is running and healthy. It will respond `200 OK` if it is running.
+</details>
