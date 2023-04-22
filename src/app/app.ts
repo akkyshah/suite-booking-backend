@@ -2,6 +2,7 @@ import NestedError from "nested-error-stacks";
 import * as Winston from "../core/winston"
 import {Config} from "@/shared";
 import {LocalEnvironment} from "@/core";
+import {Server} from "@/core/http";
 
 const logger = Winston.getLogger(module.filename);
 
@@ -14,8 +15,21 @@ export const initialize = async () => {
     const appConfig = Config.getAppConfig();
 
     Winston.configure(appConfig.appName, appConfig.logLevel);
+
+    Server.configure();
+    await Server.start(Config.getServerConfig().serverPort);
+
   } catch (error: any) {
     throw error;
+  }
+};
+
+export const stop = async () => {
+  logger.info("stopping " + Config.getAppConfig().appName);
+  try {
+    await Server.stop();
+  } catch (error: any) {
+    logger.error(error);
   }
 };
 
