@@ -1,3 +1,7 @@
+import * as Winston from "../core/winston";
+
+let logger: any;
+
 const APPLICATION_NAME = "suite-booking-backend";
 
 const CONFIGURATION: any = {
@@ -7,10 +11,9 @@ const CONFIGURATION: any = {
 };
 
 export const initialize = async () => {
-  initializeFromEnvironment();
-};
+  if (!logger) logger = Winston.getLogger(module.filename);
 
-const initializeFromEnvironment = () => {
+  logger.info("reading configuration from environment variables");
   const keys = Object.keys(CONFIGURATION).sort();
 
   for (const [, key] of keys.entries()) {
@@ -23,7 +26,7 @@ const initializeFromEnvironment = () => {
     entry.value = valueConverter(value);
 
     const loggedValue = entry.sensitive ? "********" : entry.value;
-    console.log(`configuration ${entry.env} set to ${loggedValue || "--"}`);
+    logger.info(`configuration ${entry.env} set to ${loggedValue || "--"}`);
   }
 };
 

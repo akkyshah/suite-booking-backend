@@ -1,7 +1,10 @@
 import * as App from "./src/app/app";
+import * as Winston from "./src/core/winston"
+
+const logger = Winston.getLogger(module.filename);
 
 const forceClose = (error: Error) => {
-  console.error(error);
+  logger.error(error);
   console.log("initialize error - forcefully exiting the process");
   process.exit(1);
 };
