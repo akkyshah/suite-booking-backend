@@ -1,13 +1,13 @@
 # suite-booking-backend
 
-## Setup
+---
 
 ### One-time configuration
 
 Install `node_modules` using command: `npm install`
 
 <details>
-    <summary><b>Webstorm configuration</b></summary>
+    <summary>Webstorm configuration</summary>
 
 > NOTE: Follow this if you are using Webstorm to run the project.
 
@@ -26,19 +26,46 @@ Open project in WebStorm > Add/Edit Configuration > click (+) button > select `N
 
 </details>
 
-### How to run:
+<hr/>
+
+### Run the app:
 
 Simply run the command: `npm run start`
 
 <details>
-    <summary><b>NPM Commands List</b></summary>
+    <summary>NPM Commands List</summary>
 
-* **Start**: `npm run start` - will simply start running our backend.
-* **Dev**: `npm run dev` - will run our backend in dev mode.
-* **Build**: `npm run build` - build our project in `./dist` directory.
-* **Clean**: `npm run clean` - deletes `./dist` directory.
+* **start**: `npm run start` - will simply start running our backend.
+* **dev**: `npm run dev` - will run our backend in dev mode.
+* **build**: `npm run build` - build our project in `./dist` directory.
+* **clean**: `npm run clean` - deletes `./dist` directory.
+* **integration-test**: `npm run integration-test` runs integration tests.
 
 </details>
+
+### Run tests
+
+#### Integration test
+
+Simply run the command: `npm run integration-test`
+
+<details>
+    <summary>Webstorm configuration</summary>
+
+Open project in WebStorm > Add/Edit Configuration > click (+) button > select `Mocha` configuration
+
+> * Name: `integration-test`
+> * Node Interpreter: Dropdown to select `Project node (/usr/bin/node)`
+> * Working Directory: `~/<PATH>/suite-booking-backend`
+> * Mocha Package: select `~/<PROJECT_PATH>/suite-booking-backend/node_modules/mocha`
+> * User Interface: select `bdd`
+> * Extra Mocha Options: `--require ts-node/register -r tsconfig-paths/register`
+> * Test Directory Options: Select `Test File` > Browse to select `~/<PATH>/suite-booking-backend/integration-test/index.ts`
+> * Add new before-launch command > Compile Typescript > Select `tsconfig.json` file
+
+</details>
+
+---
 
 ## Endpoints
 
