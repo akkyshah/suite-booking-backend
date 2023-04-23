@@ -24,7 +24,7 @@ export default class BookingService {
     }
   }
 
-  static async save(booking: IUnsavedBooking) {
+  static async save(booking: IUnsavedBooking): Promise<{ bookingId: string, status: string }> {
     return new Promise((resolve, reject) => {
       const bookingId = Utility.createUniqueRandomAlphaNumericId();
       const insertData = {
