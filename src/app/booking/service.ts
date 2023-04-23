@@ -178,6 +178,38 @@ export default class BookingService {
     return Utility.mergeSubsequentSlots(startDate, endDate, bookedSlots);
   }
 
+  static async cancelBookingById(bookingId: string) {
+    return new Promise((resolve, reject) => {
+      /*
+      // Delete the booking record from DB
+      Sqlite3.getDb().run(`DELETE
+                           FROM ${BookingDb.tableName}
+                           WHERE ${BookingDb.column.id} = ?`,
+        [bookingId],
+        function (error: Error | null) {
+          if (error) return reject(error);
+          // @ts-ignore
+          const numberOfRowsAffected = this.changes;
+          resolve(numberOfRowsAffected);
+        }
+      );
+      */
+
+      // Update the booking record - change status "booked" to "cancel"
+      Sqlite3.getDb().get(`
+                  UPDATE ${BookingDb.tableName}
+                  SET ${BookingDb.column.status} = ?
+                  WHERE ${BookingDb.column.id} = ? RETURNING *
+        `,
+        [BookingStatus.CANCELLED, bookingId],
+        (error: Error | null, row: any) => {
+          if (error) return reject(error);
+          resolve(row);
+        }
+      );
+    });
+  }
+
   /**
    * Usually we would do following as per our practice:
    *  1. Flat any JS object (Ex: Date / Moment) to a required-string-format or any primitive-datatype
