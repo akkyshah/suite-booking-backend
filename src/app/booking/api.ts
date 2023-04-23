@@ -3,10 +3,11 @@ import NestedError from "nested-error-stacks";
 import * as Server from "@/core/http/server";
 import {StatusCode} from "@custom-types/core";
 import BookingService from "@/app/booking/service";
+import {Config} from "@/shared";
 import {asyncQueue} from "@/core/http/express-middlewares";
 import {MomentAbstract} from "@/core";
 import {HttpError} from "@/core/http";
-import {Err} from "@/constants";
+import {Err, getPostBookingInstructions} from "@/constants";
 import {BookingStatus} from "@custom-types";
 
 const router = express.Router();
@@ -33,7 +34,10 @@ export const _httpPostBooking = async (request: Request, response: Response, nex
       endDate: body.endDate,
     });
 
-    response.status(StatusCode.OK).json(bookingConfirmation);
+    response.status(StatusCode.OK).json({
+      ...bookingConfirmation,
+      instructions: getPostBookingInstructions(Config.getServerConfig().serverPort, bookingConfirmation.bookingId)
+    });
   } catch (error: any) {
     next(new NestedError(`error saving booking`, error));
   }

@@ -48,6 +48,8 @@ describe("Booking", () => {
       assert.equal(StatusCode.OK, response.status);
       assert.exists(response.body.bookingId);
       assert.equal(response.body.status, "booked");
+      assert.exists(response.body.instructions);
+      assert.containsAllKeys(response.body.instructions, ["get-booking", "update-booking", "cancel-booking"]);
       TestData.bookingParams1.id = response.body.bookingId;
     });
 
@@ -70,6 +72,8 @@ describe("Booking", () => {
       assert.equal(StatusCode.OK, response.status);
       assert.exists(response.body.bookingId);
       assert.equal(response.body.status, "booked");
+      assert.exists(response.body.instructions);
+      assert.containsAllKeys(response.body.instructions, ["get-booking", "update-booking", "cancel-booking"]);
       TestData.bookingParams2.id = response.body.bookingId;
     });
 
@@ -88,6 +92,8 @@ describe("Booking", () => {
             assert.equal(StatusCode.OK, response.status);
             assert.exists(response.body.bookingId);
             assert.equal(response.body.status, "booked");
+            assert.exists(response.body.instructions);
+            assert.containsAllKeys(response.body.instructions, ["get-booking", "update-booking", "cancel-booking"]);
             TestData.bookingParams3.id = response.body.bookingId;
           } else {
             assert.equal(response.body.errCode, Err.V_B_1007.errCode);
