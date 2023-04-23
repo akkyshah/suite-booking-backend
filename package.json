@@ -12,9 +12,11 @@
     "integration-test": "mocha --require ts-node/register -r tsconfig-paths/register integration-test/index.ts"
   },
   "dependencies": {
+    "@joi/date": "^2.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "joi": "^17.9.1",
     "moment": "^2.29.4",
     "nested-error-stacks": "^2.1.1",
     "sqlite3": "^5.1.6",
