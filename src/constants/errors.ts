@@ -24,5 +24,9 @@ export const Err = {
   V_B_1006: {
     errCode: "V_B_1006",
     msg: "you cannot make an advance booking preceding more than 30 days"
+  },
+  V_B_1007: {
+    errCode: "V_B_1007",
+    msg: "conflict with another booking"
   }
 }

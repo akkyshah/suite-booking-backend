@@ -38,6 +38,28 @@ export default class BookingService {
   }
 
   /**
+   * @return true if `startDate` and `endDate` does not overlap any existing booking dates. otherwise false.
+   * */
+  static async isAnyConflictingBookingExist(startDate: string, endDate: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      Sqlite3.getDb().get(`
+          SELECT *
+          FROM ${BookingDb.tableName}
+          WHERE ${BookingDb.column.status} = ?
+            AND (
+                    (? >= ${BookingDb.column.startDate} AND ? < ${BookingDb.column.endDate})
+                    OR (? > ${BookingDb.column.startDate} AND ? <= ${BookingDb.column.endDate})
+                    OR (? < ${BookingDb.column.startDate} AND ? > ${BookingDb.column.endDate})
+            )
+          ORDER BY DATETIME(${BookingDb.column.startDate}) ASC
+      `, [BookingStatus.BOOKED, startDate, startDate, endDate, endDate, startDate, endDate], (error: Error | null, rows) => {
+        if (error) return reject(error);
+        resolve(!!rows)
+      })
+    })
+  }
+
+  /**
    * @param startDateStr: yyyy-mm-dd
    * @param endDateStr: yyyy-mm-dd
    * */
@@ -62,6 +84,11 @@ export default class BookingService {
       } else if (daysDiff > 30) {
         throw new HttpError(StatusCode.BAD_REQUEST, Err.V_B_1006.errCode, Err.V_B_1006.msg);
       }
+    }
+
+    const isBookingConflict = await BookingService.isAnyConflictingBookingExist(startDateStr, endDateStr);
+    if (isBookingConflict) {
+      throw new HttpError(StatusCode.NOT_ACCEPTABLE, Err.V_B_1007.errCode, Err.V_B_1007.msg);
     }
   }
 }
