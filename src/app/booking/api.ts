@@ -107,7 +107,7 @@ export const _httpUpdateBookingById = async (request: Request, response: Respons
     if (body.startDate || body.endDate) {
       const startDate = body.startDate || dbBooking.startDate;
       const endDate = body.endDate || dbBooking.endDate;
-      await BookingService.assertValidBookingTimeSlot(startDate, endDate);
+      await BookingService.assertValidBookingTimeSlot(startDate, endDate, dbBooking.id);
     }
 
     await BookingService.updateBooking(bookingId, body);

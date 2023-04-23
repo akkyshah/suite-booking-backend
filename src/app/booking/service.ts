@@ -93,17 +93,17 @@ export default class BookingService {
   /**
    * @return true if `startDate` and `endDate` does not overlap any existing booking dates. otherwise false.
    * */
-  static async isAnyConflictingBookingExist(startDate: string, endDate: string): Promise<boolean> {
+  static async isAnyConflictingBookingExist(startDate: string, endDate: string, exceptBookingId?: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       Sqlite3.getDb().get(`
           SELECT *
           FROM ${BookingDb.tableName}
-          WHERE ${BookingDb.column.status} = ?
+          WHERE ${BookingDb.column.status} = ? ${exceptBookingId ? `AND ${BookingDb.column.id} != '${exceptBookingId}'` : ""}
             AND (
-                  (? >= ${BookingDb.column.startDate} AND ? < ${BookingDb.column.endDate})
-                  OR (? > ${BookingDb.column.startDate} AND ? <= ${BookingDb.column.endDate})
-                  OR (? < ${BookingDb.column.startDate} AND ? > ${BookingDb.column.endDate})
-              )
+                    (? >= ${BookingDb.column.startDate} AND ? < ${BookingDb.column.endDate})
+                    OR (? > ${BookingDb.column.startDate} AND ? <= ${BookingDb.column.endDate})
+                    OR (? < ${BookingDb.column.startDate} AND ? > ${BookingDb.column.endDate})
+            )
           ORDER BY DATETIME(${BookingDb.column.startDate}) ASC
       `, [BookingStatus.BOOKED, startDate, startDate, endDate, endDate, startDate, endDate], (error: Error | null, rows) => {
         if (error) return reject(error);
@@ -115,8 +115,9 @@ export default class BookingService {
   /**
    * @param startDateStr: yyyy-mm-dd
    * @param endDateStr: yyyy-mm-dd
+   * @param exceptBookingId: string
    * */
-  static async assertValidBookingTimeSlot(startDateStr: string, endDateStr: string) {
+  static async assertValidBookingTimeSlot(startDateStr: string, endDateStr: string, exceptBookingId?: string) {
     const startDate = new MomentAbstract(startDateStr);
     const endDate = new MomentAbstract(endDateStr);
 
@@ -139,7 +140,7 @@ export default class BookingService {
       }
     }
 
-    const isBookingConflict = await BookingService.isAnyConflictingBookingExist(startDateStr, endDateStr);
+    const isBookingConflict = await BookingService.isAnyConflictingBookingExist(startDateStr, endDateStr, exceptBookingId);
     if (isBookingConflict) {
       throw new HttpError(StatusCode.NOT_ACCEPTABLE, Err.V_B_1007.errCode, Err.V_B_1007.msg);
     }
