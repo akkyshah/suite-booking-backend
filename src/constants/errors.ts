@@ -49,5 +49,9 @@ export const Err = {
   },
   U_B_ID_1002: {
     errCode: "U_B_ID_1002"
-  }
+  },
+  U_B_ID_1003: {
+    errCode: "U_B_ID_1002",
+    msg: "cannot modify an already cancelled booking"
+  },
 }

@@ -7,6 +7,7 @@ import {asyncQueue} from "@/core/http/express-middlewares";
 import {MomentAbstract} from "@/core";
 import {HttpError} from "@/core/http";
 import {Err} from "@/constants";
+import {BookingStatus} from "@custom-types";
 
 const router = express.Router();
 
@@ -88,6 +89,27 @@ export const _httpGetBookingById = async (request: Request, response: Response, 
   }
 };
 router.get("/:bookingId", _httpGetBookingById);
+
+/**
+ * Request params: {bookingId}
+ * Success Response: {success: true}
+ * Error Responses: Either of (B_ID_1001, U_B_ID_1003)
+ * */
+export const _httpCancelBookingById = async (request: Request, response: Response, next: NextFunction) => {
+  const bookingId = request.params.bookingId;
+  try {
+    const dbBooking = await BookingService.getBookingById(bookingId);
+    if (dbBooking.status === BookingStatus.CANCELLED) {
+      throw new HttpError(StatusCode.BAD_REQUEST, Err.U_B_ID_1003.errCode, Err.U_B_ID_1003.msg)
+    }
+    await BookingService.cancelBookingById(bookingId);
+    response.status(StatusCode.OK).json({success: true});
+  } catch (error: any) {
+    next(new NestedError(`error cancelling booking by id: ${bookingId}`, error));
+  }
+}
+// NOTE: we could also use "delete" method. But we decided to go with "patch", since we are not actually deleting booking here, just changing the status.
+router.patch("/cancel/:bookingId", _httpCancelBookingById);
 
 /**
  * Request params: {bookingId}

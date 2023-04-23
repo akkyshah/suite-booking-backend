@@ -116,4 +116,28 @@ describe("Booking", () => {
     assert.equal(response.body.errCode, Err.U_B_ID_1002.errCode);
     assert.equal(response.body.message, "\"noOfGuests\" must be less than or equal to 3");
   });
+
+  describe("Cancel booking", () => {
+    it("cancel booking by id successfully returns statusCode 200", async () => {
+      const bookingId = TestData.bookingParams2.id;
+      const response = await SuperAgent.newHttpPatchRequest(`/api/booking/cancel/${bookingId}`).send();
+      assert.equal(response.status, StatusCode.OK);
+      assert.isTrue(response.body.success);
+    });
+
+    it("perform to re-cancel a cancelled-booking by id returns statusCode 400", async () => {
+      const bookingId = TestData.bookingParams2.id;
+      const response = await SuperAgent.newHttpPatchRequest(`/api/booking/cancel/${bookingId}`).send();
+      assert.equal(response.status, StatusCode.BAD_REQUEST);
+      assert.equal(response.body.errCode, Err.U_B_ID_1003.errCode);
+      assert.equal(response.body.message, Err.U_B_ID_1003.msg);
+    });
+
+    it("perform to cancel a booking by invalid id returns statusCode 400", async () => {
+      const response = await SuperAgent.newHttpPatchRequest(`/api/booking/cancel/123`).send();
+      assert.equal(response.status, StatusCode.BAD_REQUEST);
+      assert.equal(response.body.errCode, Err.B_ID_1001.errCode);
+      assert.equal(response.body.message, Err.B_ID_1001.msg);
+    });
+  });
 });
