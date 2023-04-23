@@ -2,7 +2,7 @@ import chai from "chai";
 import chaiHttp from "chai-http";
 import * as App from "../src/app/app";
 import * as Config from "../src/shared/config";
-import {Sqlite3} from "@/shared/sqlite3";
+import {Sqlite3} from "@/shared";
 import {SuperAgent} from "./utils/superAgent";
 
 chai.use(chaiHttp);
@@ -23,6 +23,7 @@ before(async function () {
 
 // IDEs sorts the imports, hence here we have used `require(...)` statements instead of imports.
 require("./modules/health");
+require("./modules/booking");
 
 after(async () => {
   await App.stop();
