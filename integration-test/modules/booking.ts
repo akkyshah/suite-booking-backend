@@ -100,4 +100,20 @@ describe("Booking", () => {
       {from: TestData.bookingParams2.endDate, to: new MomentAbstract().add(31, "days").endOfTheDay().add(1, "milliseconds").toDateString()},
     ]);
   });
+
+  it("updating a booking to postpone by 1 day by id returns statusCode 200", async () => {
+    const bookingId = TestData.bookingParams1.id;
+    TestData.bookingParams1.startDate = new MomentAbstract().add(11, "days").startOfTheDay().toDateString();
+    const response = await SuperAgent.newHttpPatchRequest(`/api/booking/${bookingId}`).send({startDate: TestData.bookingParams1.startDate});
+    assert.equal(response.status, StatusCode.OK);
+    assert.isTrue(response.body.success);
+  });
+
+  it("updating a booking to increase number of guests more than 3 returns statusCode 400 with error message", async () => {
+    const bookingId = TestData.bookingParams1.id;
+    const response = await SuperAgent.newHttpPatchRequest(`/api/booking/${bookingId}`).send({noOfGuests: 4});
+    assert.equal(response.status, StatusCode.BAD_REQUEST);
+    assert.equal(response.body.errCode, Err.U_B_ID_1002.errCode);
+    assert.equal(response.body.message, "\"noOfGuests\" must be less than or equal to 3");
+  });
 });

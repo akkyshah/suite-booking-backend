@@ -6,7 +6,7 @@ import {MomentAbstract} from "@/core";
 import {HttpError} from "@/core/http";
 import {Err} from "@/constants";
 import {StatusCode} from "@custom-types/core";
-import {SaveBookingRequestBody} from "@/app/booking/joi";
+import {SaveBookingRequestBody, UpdateBookingRequestBody} from "@/app/booking/joi";
 
 export default class BookingService {
 
@@ -14,6 +14,13 @@ export default class BookingService {
     const result = SaveBookingRequestBody.validate(requestBody)
     if (result.error) {
       throw new HttpError(StatusCode.BAD_REQUEST, Err.P_B_1000.errCode, result.error.message)
+    }
+  }
+
+  static sanitizeHttpPatchUpdateBookingRequest(requestBody: any) {
+    const result = UpdateBookingRequestBody.validate(requestBody)
+    if (result.error) {
+      throw new HttpError(StatusCode.BAD_REQUEST, Err.U_B_ID_1002.errCode, result.error.message)
     }
   }
 
@@ -45,6 +52,34 @@ export default class BookingService {
     })
   }
 
+  static async updateBooking(bookingId: string, booking: Partial<IUnsavedBooking>) {
+    return new Promise((resolve, reject) => {
+
+      const updatedData: any = {};
+      if (booking.email) updatedData[BookingDb.column.email] = booking.email;
+      if (booking.firstName) updatedData[BookingDb.column.firstName] = booking.firstName;
+      if (booking.lastName) updatedData[BookingDb.column.lastName] = booking.lastName;
+      if (booking.noOfGuests) updatedData[BookingDb.column.noOfGuests] = booking.noOfGuests;
+      if (booking.startDate) updatedData[BookingDb.column.startDate] = booking.startDate;
+      if (booking.endDate) updatedData[BookingDb.column.endDate] = booking.endDate;
+
+      if (Object.keys(updatedData).length === 0) {
+        throw new HttpError(StatusCode.BAD_REQUEST, Err.U_B_ID_1001.errCode, Err.U_B_ID_1001.msg);
+      }
+
+      Sqlite3.getDb().run(`
+                  UPDATE ${BookingDb.tableName}
+                  SET ${Object.keys(updatedData).map(key => (`${key} = ?`)).join(",")}
+                  WHERE ${BookingDb.column.id} = ?
+        `,
+        [...Object.values(updatedData), bookingId],
+        (error: Error | null) => {
+          if (error) return reject(error);
+          resolve(undefined);
+        });
+    })
+  }
+
   static async getBookingById(bookingId: string): Promise<IDbBooking> {
     return new Promise((resolve, reject) => {
       Sqlite3.getDb().get(`
@@ -65,17 +100,17 @@ export default class BookingService {
   /**
    * @return true if `startDate` and `endDate` does not overlap any existing booking dates. otherwise false.
    * */
-  static async isAnyConflictingBookingExist(startDate: string, endDate: string): Promise<boolean> {
+  static async isAnyConflictingBookingExist(startDate: string, endDate: string, exceptBookingId?: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       Sqlite3.getDb().get(`
           SELECT *
           FROM ${BookingDb.tableName}
-          WHERE ${BookingDb.column.status} = ?
+          WHERE ${BookingDb.column.status} = ? ${exceptBookingId ? `AND ${BookingDb.column.id} != '${exceptBookingId}'` : ""}
             AND (
-                  (? >= ${BookingDb.column.startDate} AND ? < ${BookingDb.column.endDate})
-                  OR (? > ${BookingDb.column.startDate} AND ? <= ${BookingDb.column.endDate})
-                  OR (? < ${BookingDb.column.startDate} AND ? > ${BookingDb.column.endDate})
-              )
+                    (? >= ${BookingDb.column.startDate} AND ? < ${BookingDb.column.endDate})
+                    OR (? > ${BookingDb.column.startDate} AND ? <= ${BookingDb.column.endDate})
+                    OR (? < ${BookingDb.column.startDate} AND ? > ${BookingDb.column.endDate})
+            )
           ORDER BY DATETIME(${BookingDb.column.startDate}) ASC
       `, [BookingStatus.BOOKED, startDate, startDate, endDate, endDate, startDate, endDate], (error: Error | null, rows) => {
         if (error) return reject(error);
@@ -87,8 +122,9 @@ export default class BookingService {
   /**
    * @param startDateStr: yyyy-mm-dd
    * @param endDateStr: yyyy-mm-dd
+   * @param exceptBookingId: string
    * */
-  static async assertValidBookingTimeSlot(startDateStr: string, endDateStr: string) {
+  static async assertValidBookingTimeSlot(startDateStr: string, endDateStr: string, exceptBookingId?: string) {
     const startDate = new MomentAbstract(startDateStr);
     const endDate = new MomentAbstract(endDateStr);
 
@@ -111,7 +147,7 @@ export default class BookingService {
       }
     }
 
-    const isBookingConflict = await BookingService.isAnyConflictingBookingExist(startDateStr, endDateStr);
+    const isBookingConflict = await BookingService.isAnyConflictingBookingExist(startDateStr, endDateStr, exceptBookingId);
     if (isBookingConflict) {
       throw new HttpError(StatusCode.NOT_ACCEPTABLE, Err.V_B_1007.errCode, Err.V_B_1007.msg);
     }

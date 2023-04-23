@@ -89,6 +89,37 @@ export const _httpGetBookingById = async (request: Request, response: Response, 
 };
 router.get("/:bookingId", _httpGetBookingById);
 
+/**
+ * Request params: {bookingId}
+ * Request body: { [email], [firstName], [lastName], [noOfGuests], [startDate], [endDate] }
+ * Success Response: {success: true}
+ * Error Responses: Either of (
+ *      B_ID_1001, U_B_ID_1001, U_B_ID_1002,
+ *      V_B_1001, V_B_1002, V_B_1003, V_B_1004, V_B_1005, V_B_1006, V_B_1007
+ *  )
+ * */
+export const _httpUpdateBookingById = async (request: Request, response: Response, next: NextFunction) => {
+  const bookingId = request.params.bookingId;
+  const body = request.body;
+  try {
+    BookingService.sanitizeHttpPatchUpdateBookingRequest(body);
+
+    const dbBooking = await BookingService.getBookingById(bookingId);
+
+    if (body.startDate || body.endDate) {
+      const startDate = body.startDate || dbBooking.startDate;
+      const endDate = body.endDate || dbBooking.endDate;
+      await BookingService.assertValidBookingTimeSlot(startDate, endDate, dbBooking.id);
+    }
+
+    await BookingService.updateBooking(bookingId, body);
+
+    response.status(StatusCode.OK).json({success: true});
+  } catch (error: any) {
+    next(new NestedError(`error updating booking by id: ${bookingId}`, error));
+  }
+};
+router.patch("/:bookingId", asyncQueue(_httpUpdateBookingById));
 
 export const addHttpEndPoints = () => {
   Server.bindApi("/booking", router)
