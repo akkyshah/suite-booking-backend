@@ -1,3 +1,5 @@
+export const MAX_BOOKING_DAYS_LIMIT = 3;
+
 export const BookingDb = {
   tableName: "bookings",
   column: {
