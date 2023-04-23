@@ -6,7 +6,7 @@ import {MomentAbstract} from "@/core";
 import {HttpError} from "@/core/http";
 import {Err} from "@/constants";
 import {StatusCode} from "@custom-types/core";
-import {SaveBookingRequestBody} from "@/app/booking/joi";
+import {SaveBookingRequestBody, UpdateBookingRequestBody} from "@/app/booking/joi";
 
 export default class BookingService {
 
@@ -14,6 +14,13 @@ export default class BookingService {
     const result = SaveBookingRequestBody.validate(requestBody)
     if (result.error) {
       throw new HttpError(StatusCode.BAD_REQUEST, Err.P_B_1000.errCode, result.error.message)
+    }
+  }
+
+  static sanitizeHttpPatchUpdateBookingRequest(requestBody: any) {
+    const result = UpdateBookingRequestBody.validate(requestBody)
+    if (result.error) {
+      throw new HttpError(StatusCode.BAD_REQUEST, Err.U_B_ID_1002.errCode, result.error.message)
     }
   }
 

@@ -47,4 +47,7 @@ export const Err = {
     errCode: "U_B_ID_1001",
     msg: "no update fields specified"
   },
+  U_B_ID_1002: {
+    errCode: "U_B_ID_1002"
+  }
 }

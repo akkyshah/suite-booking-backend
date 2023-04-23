@@ -94,7 +94,7 @@ router.get("/:bookingId", _httpGetBookingById);
  * Request body: { [email], [firstName], [lastName], [noOfGuests], [startDate], [endDate] }
  * Success Response: {success: true}
  * Error Responses: Either of (
- *      B_ID_1001, U_B_ID_1001
+ *      B_ID_1001, U_B_ID_1001, U_B_ID_1002,
  *      V_B_1001, V_B_1002, V_B_1003, V_B_1004, V_B_1005, V_B_1006, V_B_1007
  *  )
  * */
@@ -102,6 +102,8 @@ export const _httpUpdateBookingById = async (request: Request, response: Respons
   const bookingId = request.params.bookingId;
   const body = request.body;
   try {
+    BookingService.sanitizeHttpPatchUpdateBookingRequest(body);
+
     const dbBooking = await BookingService.getBookingById(bookingId);
 
     if (body.startDate || body.endDate) {
