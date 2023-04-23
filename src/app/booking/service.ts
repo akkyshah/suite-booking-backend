@@ -1,5 +1,5 @@
 import {RunResult} from "sqlite3";
-import {BookingStatus, IDbBooking, IHttpBooking, IUnsavedBooking} from "@custom-types";
+import {BookingStatus, IDbBooking, IHttpBooking, ISlot, IUnsavedBooking} from "@custom-types";
 import {BookingDb, MAX_BOOKING_DAYS_LIMIT} from "@/app/booking/db";
 import {Sqlite3, Utility} from "@/shared";
 import {MomentAbstract} from "@/core";
@@ -115,6 +115,31 @@ export default class BookingService {
     if (isBookingConflict) {
       throw new HttpError(StatusCode.NOT_ACCEPTABLE, Err.V_B_1007.errCode, Err.V_B_1007.msg);
     }
+  }
+
+  private static async getBookings(startDate: string, endDate: string): Promise<IDbBooking[]> {
+    return new Promise((resolve, reject) => {
+      Sqlite3.getDb().all(`
+          SELECT *
+          FROM ${BookingDb.tableName}
+          WHERE ${BookingDb.column.status} = ?
+            AND ${BookingDb.column.startDate} >= ?
+            AND ${BookingDb.column.endDate} <= ?
+          ORDER BY DATETIME(${BookingDb.column.startDate}) ASC
+      `, [BookingStatus.BOOKED, startDate, endDate], (error: Error | null, rows) => {
+        if (error) return reject(error);
+        resolve(rows ? rows as IDbBooking[] : [])
+      })
+    })
+  }
+
+  static async getAvailableBookings(startDate: string, endDate: string): Promise<ISlot[]> {
+    const bookings = await BookingService.getBookings(startDate, endDate);
+    const bookedSlots: ISlot[] = bookings.map((booking: IDbBooking) => ({
+      from: booking.startDate,
+      to: booking.endDate,
+    }));
+    return Utility.mergeSubsequentSlots(startDate, endDate, bookedSlots);
   }
 
   /**
