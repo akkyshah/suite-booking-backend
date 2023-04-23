@@ -1,9 +1,9 @@
 import NestedError from "nested-error-stacks";
 import * as Winston from "../core/winston"
-import {Config} from "@/shared";
+import {Config, Sqlite3} from "@/shared";
 import {Server} from "@/core/http";
-import {Sqlite3} from "@/shared/sqlite3";
 import * as Health from "./health/api";
+import * as Booking from "@/app/booking/api";
 
 const logger = Winston.getLogger(module.filename);
 
@@ -17,6 +17,7 @@ export const initialize = async () => {
     Server.configure(Config.getBooleanDevelopmentMode());
 
     Health.addHttpEndPoints();
+    Booking.addHttpEndPoints();
 
     await Server.start(Config.getServerConfig().serverPort);
 
