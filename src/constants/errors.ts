@@ -32,4 +32,8 @@ export const Err = {
   P_B_1000: {
     errCode: "P_B_1000"
   },
+  B_ID_1001: {
+    errCode: "B_ID_1001",
+    msg: "invalid booking id"
+  }
 }

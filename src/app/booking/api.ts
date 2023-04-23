@@ -36,6 +36,22 @@ export const _httpPostBooking = async (request: Request, response: Response, nex
 };
 router.post("/", asyncQueue(_httpPostBooking));
 
+/**
+ * Request params: {bookingId}
+ * Success Response: { booking: IHttpBooking }
+ * Error Responses: Either of (B_ID_1001)
+ * */
+export const _httpGetBookingById = async (request: Request, response: Response, next: NextFunction) => {
+  const bookingId = request.params.bookingId;
+  try {
+    const dbBooking = await BookingService.getBookingById(bookingId);
+    response.status(StatusCode.OK).json({booking: BookingService.toHttp(dbBooking)});
+  } catch (error: any) {
+    next(new NestedError(`error fetching booking by id: ${bookingId}`, error));
+  }
+};
+router.get("/:bookingId", _httpGetBookingById);
+
 export const addHttpEndPoints = () => {
   Server.bindApi("/booking", router)
 };

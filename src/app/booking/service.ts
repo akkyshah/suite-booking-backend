@@ -1,5 +1,5 @@
 import {RunResult} from "sqlite3";
-import {BookingStatus, IUnsavedBooking} from "@custom-types";
+import {BookingStatus, IDbBooking, IHttpBooking, IUnsavedBooking} from "@custom-types";
 import {BookingDb, MAX_BOOKING_DAYS_LIMIT} from "@/app/booking/db";
 import {Sqlite3, Utility} from "@/shared";
 import {MomentAbstract} from "@/core";
@@ -42,6 +42,23 @@ export default class BookingService {
             status: "booked"
           });
         });
+    })
+  }
+
+  static async getBookingById(bookingId: string): Promise<IDbBooking> {
+    return new Promise((resolve, reject) => {
+      Sqlite3.getDb().get(`
+          SELECT *
+          FROM ${BookingDb.tableName}
+          WHERE ${BookingDb.column.id} = ?
+      `, [bookingId], (error: Error | null, rows) => {
+        if (error) return reject(error);
+        if (!rows) {
+          reject(new HttpError(StatusCode.BAD_REQUEST, Err.B_ID_1001.errCode, Err.B_ID_1001.msg));
+        } else {
+          resolve(rows as IDbBooking)
+        }
+      })
     })
   }
 
@@ -98,5 +115,26 @@ export default class BookingService {
     if (isBookingConflict) {
       throw new HttpError(StatusCode.NOT_ACCEPTABLE, Err.V_B_1007.errCode, Err.V_B_1007.msg);
     }
+  }
+
+  /**
+   * Usually we would do following as per our practice:
+   *  1. Flat any JS object (Ex: Date / Moment) to a required-string-format or any primitive-datatype
+   *  2. Change data shape if needed
+   *  2. Hide internal DB fields
+   *  3. Rename the column names to prevent disclosing our database fields and conventions (for simplicity, currently we are keeping them as it is)
+   *  4. Transform values to simplified form
+   * */
+  static toHttp(booking: IDbBooking): IHttpBooking {
+    return {
+      id: booking.id,
+      email: booking.email,
+      firstName: booking.firstName,
+      lastName: booking.lastName,
+      noOfGuests: booking.noOfGuests,
+      startDate: booking.startDate,
+      endDate: booking.endDate,
+      status: booking.status === BookingStatus.BOOKED ? "booked" : "cancelled",
+    };
   }
 }
