@@ -61,6 +61,11 @@ Open project in WebStorm > Add/Edit Configuration > click (+) button > select `M
 
 </details>
 
+## Environment Variables
+
+The app reads `.env.local` file to load environment variables in `process.env`. Following are the variables:
+* `DATABASE_NAME`: specify name of the database.
+
 ## Endpoints
 
 <details>
