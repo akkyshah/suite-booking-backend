@@ -64,12 +64,5 @@ Open project in WebStorm > Add/Edit Configuration > click (+) button > select `M
 ## Environment Variables
 
 The app reads `.env.local` file to load environment variables in `process.env`. Following are the variables:
+
 * `DATABASE_NAME`: specify name of the database.
-
-## Endpoints
-
-<details>
-<summary><b><i>GET /api/heath/check</i></b></summary>
-
-Used to check if server is running and healthy. It will respond `200 OK` if it is running.
-</details>
