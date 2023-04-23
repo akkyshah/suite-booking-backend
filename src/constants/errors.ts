@@ -35,5 +35,12 @@ export const Err = {
   B_ID_1001: {
     errCode: "B_ID_1001",
     msg: "invalid booking id"
+  },
+  G_AV_B_1001: {
+    errCode: "G_AV_B_1001",
+    msg: "start date should be more than 24 hours from current date"
+  },
+  G_AV_B_1002: {
+    errCode: "G_AV_B_1002",
   }
 }

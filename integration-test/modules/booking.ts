@@ -89,4 +89,15 @@ describe("Booking", () => {
     assert.exists(response.body.booking);
     assert.deepEqual(response.body.booking, {...TestData.bookingParams1, status: "booked"});
   });
+
+  it("get booking-availabilities returns statusCode 200 with list of date-ranges of booking-availability where subsequent dates are clubbed", async () => {
+    const response = await SuperAgent.newHttpGetRequest(`/api/booking/availabilities`).send();
+    assert.equal(response.status, StatusCode.OK);
+    assert.exists(response.body.availabilities);
+    assert.deepEqual(response.body.availabilities, [
+      {from: new MomentAbstract().add(1, "days").endOfTheDay().add(1, "milliseconds").toDateString(), to: TestData.bookingParams1.startDate},
+      {from: TestData.bookingParams1.endDate, to: TestData.bookingParams2.startDate},
+      {from: TestData.bookingParams2.endDate, to: new MomentAbstract().add(31, "days").endOfTheDay().add(1, "milliseconds").toDateString()},
+    ]);
+  });
 });
