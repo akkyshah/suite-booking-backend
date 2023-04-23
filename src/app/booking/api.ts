@@ -3,6 +3,7 @@ import NestedError from "nested-error-stacks";
 import * as Server from "@/core/http/server";
 import {StatusCode} from "@custom-types/core";
 import BookingService from "@/app/booking/service";
+import {asyncQueue} from "@/core/http/express-middlewares";
 
 const router = express.Router();
 
@@ -33,7 +34,7 @@ export const _httpPostBooking = async (request: Request, response: Response, nex
     next(new NestedError(`error saving booking`, error));
   }
 };
-router.post("/", _httpPostBooking);
+router.post("/", asyncQueue(_httpPostBooking));
 
 export const addHttpEndPoints = () => {
   Server.bindApi("/booking", router)

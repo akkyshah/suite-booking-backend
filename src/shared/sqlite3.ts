@@ -7,11 +7,16 @@ export class Sqlite3 {
   private static dbName: string;
   static db: Database;
 
-  static init(dbName: string) {
+  static async init(dbName: string) {
     this.dbName = dbName;
     //Sqlite3.db = new sqlite3.Database(`:memory:`);  // in-memory database
     Sqlite3.db = new sqlite3.Database(`./${dbName}.sqlite`);  // persistent database
-    Sqlite3.db.run(BookingTableCreationQuery);
+    return new Promise((resolve, reject) => {
+      Sqlite3.db.run(BookingTableCreationQuery, (error: Error | null) => {
+        if (error) return reject(error);
+        resolve(undefined);
+      });
+    })
   }
 
   static getDb() {
@@ -22,11 +27,17 @@ export class Sqlite3 {
   /**
    * NOTE: used only by tests
    * */
-  static __dropTable() {
-    if (Sqlite3.dbName.includes("-test")) {
-      Sqlite3.getDb().run(`DROP TABLE IF EXISTS ${BookingDb.tableName}`);
-    } else {
-      throw new Error("permission denied!");
-    }
+  static async __clearData() {
+    return new Promise((resolve, reject) => {
+      if (Sqlite3.dbName.includes("-test")) {
+        Sqlite3.getDb().run(`DELETE
+                             FROM ${BookingDb.tableName}`, (error: Error | null) => {
+          if (error) return reject(error);
+          resolve(undefined);
+        });
+      } else {
+        throw new Error("permission denied!");
+      }
+    })
   }
 }

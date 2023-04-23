@@ -9,7 +9,7 @@ const logger = Winston.getLogger(module.filename);
 
 export const initialize = async () => {
   try {
-    Sqlite3.init(Config.getDbConfig().dbName);
+    await Sqlite3.init(Config.getDbConfig().dbName);
 
     const appConfig = Config.getAppConfig();
     Winston.configure(appConfig.appName, appConfig.logLevel);
