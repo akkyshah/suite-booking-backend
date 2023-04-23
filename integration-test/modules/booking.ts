@@ -55,10 +55,28 @@ describe("Booking", () => {
     assert.equal(response.body.message, "\"noOfGuests\" must be less than or equal to 3");
   });
 
-  it("save booking with start-date and end-date not conflicting with any other booking returns success with unique booking identifier", async () => {
-    const response = await SuperAgent.newHttpPostRequest("/api/booking").send(TestData.bookingParams2);
-    assert.equal(StatusCode.OK, response.status);
-    assert.exists(response.body.bookingId);
-    assert.equal(response.body.status, "booked");
+  it("save booking with start-date and end-date in concurrent will create only 1 booking", function () {
+    this.timeout(5000);
+    return new Promise(async resolve => {
+      const tasks = [];
+      for (let i = 0; i < 1000; i++) {
+        tasks.push(SuperAgent.newHttpPostRequest("/api/booking").send(TestData.bookingParams2));
+      }
+      const responses = await Promise.all(tasks);
+      let successCount = 0;
+      responses.map((response: any) => {
+        if (response.body?.bookingId) {
+          successCount++;
+          assert.equal(StatusCode.OK, response.status);
+          assert.exists(response.body.bookingId);
+          assert.equal(response.body.status, "booked");
+        } else {
+          assert.equal(response.body.errCode, Err.V_B_1007.errCode);
+          assert.equal(response.body.message, Err.V_B_1007.msg);
+        }
+      });
+      assert.equal(successCount, 1);
+      resolve(undefined);
+    })
   });
 });
