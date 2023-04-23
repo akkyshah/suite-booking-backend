@@ -67,6 +67,28 @@ describe("Booking", () => {
       assert.equal(response.body.message, "\"noOfGuests\" must be less than or equal to 3");
     });
 
+    it("booking for more than 3 days returns error with statusCode 400", async () => {
+      const requestBody = {
+        startDate: new MomentAbstract().add(15, "days").startOfTheDay().toDateString(),
+        endDate: new MomentAbstract().add(20, "days").startOfTheDay().toDateString()
+      }
+      const response = await SuperAgent.newHttpPostRequest("/api/booking").send({...TestData.bookingParams2, ...requestBody});
+      assert.equal(response.status, StatusCode.BAD_REQUEST);
+      assert.equal(response.body.errCode, Err.V_B_1003.errCode);
+      assert.equal(response.body.message, Err.V_B_1003.msg);
+    });
+
+    it("booking with past startDate returns error with statusCode 400", async () => {
+      const requestBody = {
+        startDate: new MomentAbstract().subtract(5, "days").startOfTheDay().toDateString(),
+        endDate: new MomentAbstract().subtract(3, "days").startOfTheDay().toDateString()
+      }
+      const response = await SuperAgent.newHttpPostRequest("/api/booking").send({...TestData.bookingParams2, ...requestBody});
+      assert.equal(response.status, StatusCode.BAD_REQUEST);
+      assert.equal(response.body.errCode, Err.V_B_1004.errCode);
+      assert.equal(response.body.message, Err.V_B_1004.msg);
+    });
+
     it("save booking where dates do not conflict with another booking successfully returns statusCode 200 with a unique booking identifier", async () => {
       const response = await SuperAgent.newHttpPostRequest("/api/booking").send(TestData.bookingParams2);
       assert.equal(StatusCode.OK, response.status);
