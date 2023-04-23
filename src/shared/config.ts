@@ -7,7 +7,8 @@ const APPLICATION_NAME = "suite-booking-backend";
 const CONFIGURATION: any = {
   developmentMode: {env: "DEVELOPMENT_MODE", converter: booleanConverter},
   serverPort: {env: "SERVER_PORT", converter: integerConverter},
-  logLevel: {env: "LOG_LEVEL"}
+  logLevel: {env: "LOG_LEVEL"},
+  dbName: {env: "DATABASE_NAME"}
 };
 
 export const initialize = () => {
@@ -34,6 +35,12 @@ export const getAppConfig = () => {
   return {
     appName: APPLICATION_NAME,
     logLevel: CONFIGURATION.logLevel.value
+  }
+}
+
+export const getDbConfig = () => {
+  return {
+    dbName: CONFIGURATION.dbName.value
   }
 }
 

@@ -2,14 +2,16 @@ import NestedError from "nested-error-stacks";
 import * as Winston from "../core/winston"
 import {Config} from "@/shared";
 import {Server} from "@/core/http";
+import {Sqlite3} from "@/shared/sqlite3";
 import * as Health from "./health/api";
 
 const logger = Winston.getLogger(module.filename);
 
 export const initialize = async () => {
   try {
-    const appConfig = Config.getAppConfig();
+    Sqlite3.init(Config.getDbConfig().dbName);
 
+    const appConfig = Config.getAppConfig();
     Winston.configure(appConfig.appName, appConfig.logLevel);
 
     Server.configure(Config.getBooleanDevelopmentMode());
