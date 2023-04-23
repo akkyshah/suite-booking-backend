@@ -2,8 +2,8 @@ import chai from "chai";
 import chaiHttp from "chai-http";
 import * as App from "../src/app/app";
 import * as Config from "../src/shared/config";
-import {Sqlite3} from "@/shared";
 import {SuperAgent} from "./utils/superAgent";
+import {Sqlite3} from "@/shared";
 
 chai.use(chaiHttp);
 
@@ -18,6 +18,7 @@ before(async function () {
     SuperAgent.setHttpServerUrl(`http://localhost:${testConfig.serverPort}`);
     Config.__setTestConfig(testConfig);
     await App.initialize();
+    await Sqlite3.__clearData();
   }
 );
 
@@ -27,5 +28,5 @@ require("./modules/booking");
 
 after(async () => {
   await App.stop();
-  await Sqlite3.__dropTable();
+  // NOTE: we are not deleting test database here, instead we will delete test-data on restart of these tests. This will help us to look at test-data at the end of tests.
 });
