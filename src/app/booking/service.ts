@@ -56,6 +56,10 @@ export default class BookingService {
       if (booking.startDate) updatedData[BookingDb.column.startDate] = booking.startDate;
       if (booking.endDate) updatedData[BookingDb.column.endDate] = booking.endDate;
 
+      if (Object.keys(updatedData).length === 0) {
+        throw new HttpError(StatusCode.BAD_REQUEST, Err.U_B_ID_1001.errCode, Err.U_B_ID_1001.msg);
+      }
+
       Sqlite3.getDb().run(`
                   UPDATE ${BookingDb.tableName}
                   SET ${Object.keys(updatedData).map(key => (`${key} = ?`)).join(",")}
