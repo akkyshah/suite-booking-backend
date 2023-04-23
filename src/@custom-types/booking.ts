@@ -18,3 +18,7 @@ export interface IDbBooking {
 
 export interface IUnsavedBooking extends Omit<IDbBooking, "id" | "status" | "createdOn" | "modifiedOn"> {
 }
+
+export interface IHttpBooking extends Omit<IDbBooking, "createdOn" | "modifiedOn" | "status"> {
+  status: string
+}

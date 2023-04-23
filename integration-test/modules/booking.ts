@@ -39,6 +39,7 @@ describe("Booking", () => {
     assert.equal(StatusCode.OK, response.status);
     assert.exists(response.body.bookingId);
     assert.equal(response.body.status, "booked");
+    TestData.bookingParams1.id = response.body.bookingId;
   });
 
   it("save booking with start-date and end-date conflicting with another booking returns error with statusCode 406", async () => {
@@ -70,6 +71,7 @@ describe("Booking", () => {
           assert.equal(StatusCode.OK, response.status);
           assert.exists(response.body.bookingId);
           assert.equal(response.body.status, "booked");
+          TestData.bookingParams2.id = response.body.bookingId;
         } else {
           assert.equal(response.body.errCode, Err.V_B_1007.errCode);
           assert.equal(response.body.message, Err.V_B_1007.msg);
@@ -78,5 +80,13 @@ describe("Booking", () => {
       assert.equal(successCount, 1);
       resolve(undefined);
     })
+  });
+
+  it("get booking by id successfully returns booking information with status=booked", async () => {
+    const bookingId = TestData.bookingParams1.id;
+    const response = await SuperAgent.newHttpGetRequest(`/api/booking/${bookingId}`).send();
+    assert.equal(response.status, StatusCode.OK);
+    assert.exists(response.body.booking);
+    assert.deepEqual(response.body.booking, {...TestData.bookingParams1, status: "booked"});
   });
 });
