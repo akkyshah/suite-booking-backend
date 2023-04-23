@@ -102,6 +102,7 @@ export const _httpCancelBookingById = async (request: Request, response: Respons
     if (dbBooking.status === BookingStatus.CANCELLED) {
       throw new HttpError(StatusCode.BAD_REQUEST, Err.U_B_ID_1003.errCode, Err.U_B_ID_1003.msg)
     }
+
     await BookingService.cancelBookingById(bookingId);
     response.status(StatusCode.OK).json({success: true});
   } catch (error: any) {
@@ -116,7 +117,7 @@ router.patch("/cancel/:bookingId", _httpCancelBookingById);
  * Request body: { [email], [firstName], [lastName], [noOfGuests], [startDate], [endDate] }
  * Success Response: {success: true}
  * Error Responses: Either of (
- *      B_ID_1001, U_B_ID_1001, U_B_ID_1002,
+ *      B_ID_1001, U_B_ID_1001, U_B_ID_1002, U_B_ID_1003,
  *      V_B_1001, V_B_1002, V_B_1003, V_B_1004, V_B_1005, V_B_1006, V_B_1007
  *  )
  * */
@@ -127,6 +128,9 @@ export const _httpUpdateBookingById = async (request: Request, response: Respons
     BookingService.sanitizeHttpPatchUpdateBookingRequest(body);
 
     const dbBooking = await BookingService.getBookingById(bookingId);
+    if (dbBooking.status === BookingStatus.CANCELLED) {
+      throw new HttpError(StatusCode.BAD_REQUEST, Err.U_B_ID_1003.errCode, Err.U_B_ID_1003.msg)
+    }
 
     if (body.startDate || body.endDate) {
       const startDate = body.startDate || dbBooking.startDate;
