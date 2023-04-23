@@ -45,6 +45,30 @@ export default class BookingService {
     })
   }
 
+  static async updateBooking(bookingId: string, booking: Partial<IUnsavedBooking>) {
+    return new Promise((resolve, reject) => {
+
+      const updatedData: any = {};
+      if (booking.email) updatedData[BookingDb.column.email] = booking.email;
+      if (booking.firstName) updatedData[BookingDb.column.firstName] = booking.firstName;
+      if (booking.lastName) updatedData[BookingDb.column.lastName] = booking.lastName;
+      if (booking.noOfGuests) updatedData[BookingDb.column.noOfGuests] = booking.noOfGuests;
+      if (booking.startDate) updatedData[BookingDb.column.startDate] = booking.startDate;
+      if (booking.endDate) updatedData[BookingDb.column.endDate] = booking.endDate;
+
+      Sqlite3.getDb().run(`
+                  UPDATE ${BookingDb.tableName}
+                  SET ${Object.keys(updatedData).map(key => (`${key} = ?`)).join(",")}
+                  WHERE ${BookingDb.column.id} = ?
+        `,
+        [...Object.values(updatedData), bookingId],
+        (error: Error | null) => {
+          if (error) return reject(error);
+          resolve(undefined);
+        });
+    })
+  }
+
   static async getBookingById(bookingId: string): Promise<IDbBooking> {
     return new Promise((resolve, reject) => {
       Sqlite3.getDb().get(`
