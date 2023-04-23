@@ -16,6 +16,11 @@ export interface IDbBooking {
   modifiedOn: string,
 }
 
+export interface ISlot {
+  from: string,
+  to: string
+}
+
 export interface IUnsavedBooking extends Omit<IDbBooking, "id" | "status" | "createdOn" | "modifiedOn"> {
 }
 

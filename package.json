@@ -20,6 +20,7 @@
     "joi": "^17.9.1",
     "moment": "^2.29.4",
     "nested-error-stacks": "^2.1.1",
+    "slot-calculator": "^2.2.0",
     "sqlite3": "^5.1.6",
     "uuid": "^9.0.0",
     "winston": "^3.8.2"
