@@ -28,5 +28,8 @@ export const Err = {
   V_B_1007: {
     errCode: "V_B_1007",
     msg: "conflict with another booking"
-  }
+  },
+  P_B_1000: {
+    errCode: "P_B_1000"
+  },
 }

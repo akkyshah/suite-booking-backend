@@ -48,6 +48,13 @@ describe("Booking", () => {
     assert.equal(response.body.message, Err.V_B_1007.msg);
   });
 
+  it("save booking with more than 3 guests returns error with statusCode 400", async () => {
+    const response = await SuperAgent.newHttpPostRequest("/api/booking").send({...TestData.bookingParams2, noOfGuests: 10});
+    assert.equal(response.status, StatusCode.BAD_REQUEST);
+    assert.equal(response.body.errCode, Err.P_B_1000.errCode);
+    assert.equal(response.body.message, "\"noOfGuests\" must be less than or equal to 3");
+  });
+
   it("save booking with start-date and end-date not conflicting with any other booking returns success with unique booking identifier", async () => {
     const response = await SuperAgent.newHttpPostRequest("/api/booking").send(TestData.bookingParams2);
     assert.equal(StatusCode.OK, response.status);

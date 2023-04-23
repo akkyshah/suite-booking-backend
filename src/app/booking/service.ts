@@ -6,8 +6,16 @@ import {MomentAbstract} from "@/core";
 import {HttpError} from "@/core/http";
 import {Err} from "@/constants";
 import {StatusCode} from "@custom-types/core";
+import {SaveBookingRequestBody} from "@/app/booking/joi";
 
 export default class BookingService {
+
+  static sanitizeHttpPostBookingRequest(requestBody: any) {
+    const result = SaveBookingRequestBody.validate(requestBody)
+    if (result.error) {
+      throw new HttpError(StatusCode.BAD_REQUEST, Err.P_B_1000.errCode, result.error.message)
+    }
+  }
 
   static async save(booking: IUnsavedBooking) {
     return new Promise((resolve, reject) => {
@@ -31,7 +39,7 @@ export default class BookingService {
           if (error) return reject(error);
           resolve({
             bookingId: bookingId,
-            status: insertData[BookingDb.column.status]
+            status: "booked"
           });
         });
     })
@@ -47,10 +55,10 @@ export default class BookingService {
           FROM ${BookingDb.tableName}
           WHERE ${BookingDb.column.status} = ?
             AND (
-                    (? >= ${BookingDb.column.startDate} AND ? < ${BookingDb.column.endDate})
-                    OR (? > ${BookingDb.column.startDate} AND ? <= ${BookingDb.column.endDate})
-                    OR (? < ${BookingDb.column.startDate} AND ? > ${BookingDb.column.endDate})
-            )
+                  (? >= ${BookingDb.column.startDate} AND ? < ${BookingDb.column.endDate})
+                  OR (? > ${BookingDb.column.startDate} AND ? <= ${BookingDb.column.endDate})
+                  OR (? < ${BookingDb.column.startDate} AND ? > ${BookingDb.column.endDate})
+              )
           ORDER BY DATETIME(${BookingDb.column.startDate}) ASC
       `, [BookingStatus.BOOKED, startDate, startDate, endDate, endDate, startDate, endDate], (error: Error | null, rows) => {
         if (error) return reject(error);
