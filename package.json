@@ -9,7 +9,8 @@
     "clean": "rm -fr ./dist",
     "dev": "ts-node-dev -r tsconfig-paths/register index.ts",
     "start": "ts-node -r tsconfig-paths/register index.ts",
-    "integration-test": "mocha --require ts-node/register -r tsconfig-paths/register integration-test/index.ts"
+    "integration-test": "mocha --require ts-node/register -r tsconfig-paths/register integration-test/index.ts",
+    "unit-test": "mocha --require ts-node/register -r tsconfig-paths/register unit-test/index.ts"
   },
   "dependencies": {
     "@joi/date": "^2.1.0",
@@ -37,6 +38,7 @@
     "chai": "^4.3.7",
     "chai-http": "^4.3.0",
     "mocha": "^10.2.0",
+    "sinon": "^15.0.4",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",

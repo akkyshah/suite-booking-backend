@@ -15,6 +15,7 @@ export default class BookingService {
     if (result.error) {
       throw new HttpError(StatusCode.BAD_REQUEST, Err.P_B_1000.errCode, result.error.message)
     }
+    return true;
   }
 
   static sanitizeHttpPatchUpdateBookingRequest(requestBody: any) {
@@ -22,6 +23,7 @@ export default class BookingService {
     if (result.error) {
       throw new HttpError(StatusCode.BAD_REQUEST, Err.U_B_ID_1002.errCode, result.error.message)
     }
+    return true;
   }
 
   static async save(booking: IUnsavedBooking): Promise<{ bookingId: string, status: string }> {
@@ -142,7 +144,7 @@ export default class BookingService {
         throw new HttpError(StatusCode.BAD_REQUEST, Err.V_B_1004.errCode, Err.V_B_1004.msg);
       } else if (daysDiff === 0) {
         throw new HttpError(StatusCode.BAD_REQUEST, Err.V_B_1005.errCode, Err.V_B_1005.msg);
-      } else if (daysDiff > 30) {
+      } else if (daysDiff >= 30) {
         throw new HttpError(StatusCode.BAD_REQUEST, Err.V_B_1006.errCode, Err.V_B_1006.msg);
       }
     }
@@ -151,6 +153,8 @@ export default class BookingService {
     if (isBookingConflict) {
       throw new HttpError(StatusCode.NOT_ACCEPTABLE, Err.V_B_1007.errCode, Err.V_B_1007.msg);
     }
+
+    return true;
   }
 
   private static async getBookings(startDate: string, endDate: string): Promise<IDbBooking[]> {

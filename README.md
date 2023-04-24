@@ -61,6 +61,26 @@ Open project in WebStorm > Add/Edit Configuration > click (+) button > select `M
 
 </details>
 
+#### Integration test
+
+Simply run the command: `npm run unit-test`
+
+<details>
+    <summary>Webstorm configuration</summary>
+
+Open project in WebStorm > Add/Edit Configuration > click (+) button > select `Mocha` configuration
+
+> * Name: `unit-test`
+> * Node Interpreter: Dropdown to select `Project node (/usr/bin/node)`
+> * Working Directory: `~/<PATH>/suite-booking-backend`
+> * Mocha Package: select `~/<PROJECT_PATH>/suite-booking-backend/node_modules/mocha`
+> * User Interface: select `bdd`
+> * Extra Mocha Options: `--require ts-node/register -r tsconfig-paths/register`
+> * Test Directory Options: Select `Test File` > Browse to select `~/<PATH>/suite-booking-backend/unit-test/index.ts`
+> * Add new before-launch command > Compile Typescript > Select `tsconfig.json` file
+
+</details>
+
 ## Environment Variables
 
 The app reads `.env.local` file to load environment variables in `process.env`. Following are the variables:
