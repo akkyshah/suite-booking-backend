@@ -22,7 +22,8 @@
   },
   "include": [
     "src/**/*",
-    "integration-test/**/*"
+    "integration-test/**/*",
+    "unit-test/**/*"
   ],
   "exclude": [
     "dist",
